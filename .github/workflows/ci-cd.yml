@@ -1,34 +1,35 @@
-name: CI/CD Pipeline
+name: CI
 
 on:
   push:
     branches:
-      - main  # Set the branch you want to trigger the workflow on
+      - main  # Change this to your default branch if it's different
   pull_request:
     branches:
-      - main  # Set the branch you want to trigger the workflow on
+      - main  # Run on PRs targeting the main branch
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out the code
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
 
-      - name: Docker Login
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: Build the Docker image
-        run: docker build -t ishwaryathirumurugan05/mlops-sentimental-analysis-app:latest .
-
-      - name: Run Tests
-        run: docker run --rm ishwaryathirumurugan05/mlops-sentimental-analysis-app:latest python -m unittest discover -s tests -p "*.py"
-
-      - name: Deploy
+      - name: Install dependencies
         run: |
-          echo "Deploying your application..."
-          # Add your deployment commands here, e.g., SSH to your server, Docker commands, etc.
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build Docker image
+        run: |
+          docker build -t mlops-sentimental-analysis-app .
+
+      - name: Run tests
+        run: |
+          docker run --rm mlops-sentimental-analysis-app
