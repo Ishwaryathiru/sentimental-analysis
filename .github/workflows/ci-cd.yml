@@ -19,17 +19,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
+      - name: Docker Login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
       - name: Build the Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: Dockerfile
-          push: false  # Set to true if you want to push to a container registry
-          tags: mlops-sentimental-analysis-app:latest  # Replace with your image name
+        run: docker build -t ishwaryathirumurugan05/mlops-sentimental-analysis-app:latest .
 
       - name: Run Tests
-        run: |
-          docker run --rm ishwaryathirumurugan05/mlops-sentimental-analysis-app:latest python -m unittest discover  # Replace with your test command
+        run: docker run --rm ishwaryathirumurugan05/mlops-sentimental-analysis-app:latest python -m unittest discover
 
       - name: Deploy
         run: |
