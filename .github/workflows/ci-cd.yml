@@ -29,7 +29,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          docker run --rm mlops-sentimental-analysis-app:latest python -m unittest discover  # Replace with your test command
+          docker run --rm ishwaryathirumurugan05/mlops-sentimental-analysis-app:latest python -m unittest discover  # Replace with your test command
 
       - name: Deploy
         run: |
