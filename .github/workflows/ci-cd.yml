@@ -9,24 +9,62 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.12'  # Specify your Python version here
+    - name: Check out the repository
+      uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'  # Specify the Python version
 
-      - name: Run tests
-        run: |
-          # Replace with your test command (e.g., pytest, unittest)
-          pytest tests/
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        pytest tests/  # Assumes you have tests in a 'tests' folder
+
+    - name: Lint with Flake8
+      run: |
+        pip install flake8
+        flake8 --max-line-length=88 .  # Lint the entire repository
+
+  model-check:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v2
+
+    - name: Validate Model
+      run: |
+        python -c "
+        from joblib import load
+        try:
+            model = load('model/text_emotion.pkl')
+            print('Model loaded successfully')
+        except Exception as e:
+            print(f'Model load failed: {e}')
+            exit(1)
+        "
+
+  package:
+    runs-on: ubuntu-latest
+    needs: model-check
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v2
+
+    - name: Build package
+      run: |
+        # Package or archive the application if needed
+        tar -czvf app_package.tar.gz . 
+        echo "Package created successfully"
