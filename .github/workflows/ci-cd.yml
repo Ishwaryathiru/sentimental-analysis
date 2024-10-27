@@ -26,7 +26,7 @@ jobs:
         run: docker build -t ishwaryathirumurugan05/mlops-sentimental-analysis-app:latest .
 
       - name: Run Tests
-        run: docker run --rm ishwaryathirumurugan05/mlops-sentimental-analysis-app:latest python -m unittest discover
+        run: docker run --rm ishwaryathirumurugan05/mlops-sentimental-analysis-app:latest python -m unittest discover -s tests -p "*.py"
 
       - name: Deploy
         run: |
